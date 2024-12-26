@@ -87,7 +87,7 @@ def search_in_google_sheet(error_message):
         print(f"Error querying Google Sheet: {str(e)}")
         return None
 
-@app.route('/upload_image', methods=['OPTIONS'])
+@app.route('/upload_image', methods=['POST'])
 def upload_image_options():
     return '', 200
 def upload_image():
