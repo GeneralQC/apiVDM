@@ -8,7 +8,7 @@ import requests
 from rapidfuzz import fuzz
 
 app = Flask(__name__)
-CORS(app)  # เปิดใช้งาน CORS
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # กำหนด path ของ Tesseract OCR
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -87,7 +87,9 @@ def search_in_google_sheet(error_message):
         print(f"Error querying Google Sheet: {str(e)}")
         return None
 
-@app.route('/upload_image', methods=['POST'])
+@app.route('/upload_image', methods=['OPTIONS'])
+def upload_image_options():
+    return '', 200
 def upload_image():
     try:
         # ตรวจสอบว่ามีไฟล์ภาพในคำขอหรือไม่
