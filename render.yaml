@@ -2,5 +2,6 @@ services:
   - type: web
     name: apiVDM
     env: python
-    buildCommand: ""
+    plan: free
+    buildCommand: pip install -r requirements.txt
     startCommand: python api.py
