@@ -87,45 +87,27 @@ def search_in_google_sheet(error_message):
         print(f"Error querying Google Sheet: {str(e)}")
         return None
 
-@app.route('/upload_image', methods=['POST'])
-def upload_image_options():
-    return '', 200
+@app.route('/upload_image', methods=['POST', 'OPTIONS'])
 def upload_image():
+    if request.method == 'OPTIONS':
+        # ตอบกลับ OPTIONS request
+        return '', 200
+
     try:
-        # ตรวจสอบว่ามีไฟล์ภาพในคำขอหรือไม่
+        # ตรวจสอบไฟล์
         if 'image' not in request.files:
             return jsonify({"error": "No image provided"}), 400
 
-        # โหลดภาพและแปลงเป็น RGB
+        # ประมวลผลภาพ (ตัวอย่าง)
         file = request.files['image']
         img = Image.open(file.stream).convert('RGB')
-
-        # ใช้ Tesseract OCR ตรวจจับข้อความ
         text = pytesseract.image_to_string(img, lang='tha+eng')
+        print(f"OCR Text: {text}")
 
-        # พิมพ์ข้อความ OCR ที่อ่านได้ใน Console
-        print(f"Full OCR Text: {text}")
-
-        # ดึงข้อความที่เป็น Error Message
-        error_message = extract_error_message(text)
-
-        if not error_message:
-            return jsonify({"response": "No error message found in the text."})
-
-        print(f"Extracted Error Message: {error_message}")
-
-        # ค้นหาคำตอบใน Google Sheet
-        answer = search_in_google_sheet(error_message)
-
-        # ส่งผลลัพธ์กลับไปยัง Frontend
-        response = {
-            "ocr_text": error_message,  # ข้อความที่ OCR อ่านได้
-            "response": answer if answer else "Sorry, no relevant information found in our database."
-        }
-        return jsonify(response)
-
+        # ส่งคำตอบกลับ
+        return jsonify({"success": True, "ocr_text": text})
     except Exception as e:
-        traceback.print_exc()
+        # ส่งข้อผิดพลาดกลับ
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
